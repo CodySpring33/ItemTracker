@@ -36,7 +36,7 @@ pip install windows-curses
 2. Run the script:
 
 ```bash
-python csgo.py
+python main.py
 ```
 
 3. Follow the on-screen instructions to add items to your tracking list, view prices, and generate graphs.
