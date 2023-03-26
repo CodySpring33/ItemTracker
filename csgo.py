@@ -5,6 +5,8 @@ import urllib.parse
 import json
 from tabulate import tabulate
 import matplotlib.pyplot as plt
+from rich.console import Console
+from rich.table import Table
 
 
 DB_NAME = "csgo_items.db"
@@ -21,7 +23,16 @@ def print_ascii_art():
                                                                                                  
                                                                                                  
                                                                                                  '''
-    print(ascii_art)
+    console = Console()
+
+    for line in ascii_art.splitlines():
+        formatted_line = ""
+        for char in line:
+            if char == "$":
+                formatted_line += "[green]$[/green]"
+            else:
+                formatted_line += f"{char}" if char != " " else " "
+        console.print(formatted_line)
 
 def init_db():
     with sqlite3.connect(DB_NAME) as connection:
@@ -147,6 +158,15 @@ def user_wants_to_add_item():
         else:
             print("Invalid input. Please enter 'y' or 'n'.")
 
+def get_previous_price(name):
+    with sqlite3.connect(DB_NAME) as connection:
+        cursor = connection.cursor()
+        cursor.execute("SELECT price FROM item_prices WHERE name=? ORDER BY timestamp DESC LIMIT 1", (name,))
+        result = cursor.fetchone()
+    return result[0] if result else None
+
+
+
 def display_tracked_items():
     tracked_items = get_tracked_items()
     items_data = []
@@ -154,11 +174,34 @@ def display_tracked_items():
         name, url = item
         price = fetch_item_value(url)
         if price is not None:
-            items_data.append([index, name, price])
+            previous_price = get_previous_price(name)
             store_item_price(name, float(price.strip("$")))
-    
-    table = tabulate(items_data, headers=["Index", "Item Name", "Price"], tablefmt="grid")
-    print(table)
+            if previous_price is not None:
+                price_diff = float(price.strip("$")) - previous_price
+                if price_diff > 0:
+                    arrow = "↑"
+                    color = "green"
+                elif price_diff < 0:
+                    arrow = "↓"
+                    color = "red"
+                else:
+                    arrow = "→"
+                    color = "yellow"
+                formatted_price = f"{price} [bold {color}]{arrow}[/bold {color}]"
+            else:
+                formatted_price = price
+            items_data.append([index, name, formatted_price])
+
+    table = Table(title="Tracked Items", show_header=True, header_style="bold")
+    table.add_column("Index")
+    table.add_column("Item Name")
+    table.add_column("Price")
+
+    for row in items_data:
+        table.add_row(str(row[0]), row[1], row[2])
+
+    console = Console()
+    console.print(table)
 
 def get_item_by_index(index):
     tracked_items = get_tracked_items()
@@ -196,8 +239,9 @@ def remove_items_by_user_input():
 
 if __name__ == "__main__":
     init_db()
-
+    console = Console()
     print_ascii_art()
+
 
     while True:
         action = input("Do you want to (a)dd, (r)emove, (g)raph, or (q)uit? ").lower()
