@@ -5,6 +5,12 @@ import threading
 
 exit_program = False
 
+def user_input_handler():
+    global exit_program
+    user_input = input()
+    if user_input.lower() == 'q':
+        exit_program = True  
+
 if __name__ == "__main__":
     db.init_db()
     console = Console()
@@ -46,7 +52,7 @@ if __name__ == "__main__":
         utils.display_tracked_items()
         print("Enter q to exit the program at any time.")
 
-        input_thread = threading.Thread(target=utils.user_input_handler, daemon=True)
+        input_thread = threading.Thread(target=user_input_handler, daemon=True)
         input_thread.start()
         input_thread.join(timeout=320)
 

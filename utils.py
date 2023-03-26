@@ -107,10 +107,4 @@ def get_item_by_index(index):
     if 0 <= index < len(tracked_items):
         return tracked_items[index]
     else:
-        return None
-    
-def user_input_handler():
-    global exit_program
-    user_input = input()
-    if user_input.lower() == 'q':
-        exit_program = True    
+        return None  
