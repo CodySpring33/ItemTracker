@@ -3,10 +3,11 @@ import sqlite3
 import time
 import urllib.parse
 import json
-from tabulate import tabulate
 import matplotlib.pyplot as plt
 from rich.console import Console
 from rich.table import Table
+import threading
+import sys
 
 
 DB_NAME = "csgo_items.db"
@@ -236,12 +237,19 @@ def remove_items_by_user_input():
             except ValueError:
                 print("Invalid input. Please enter a valid index or 'q' to quit.")
 
+def user_input_handler():
+    while True:
+        user_input = input()
+        if user_input.lower() == 'q':
+            sys.exit(0)
 
 if __name__ == "__main__":
     init_db()
     console = Console()
     print_ascii_art()
 
+    input_thread = threading.Thread(target=user_input_handler, daemon=True)
+    input_thread.start()
 
     while True:
         action = input("Do you want to (a)dd, (r)emove, (g)raph, or (q)uit? ").lower()
