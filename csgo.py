@@ -9,7 +9,7 @@ from rich.table import Table
 import threading
 import sys
 
-
+exit_program = False
 DB_NAME = "csgo_items.db"
 
 def print_ascii_art():
@@ -237,6 +237,13 @@ def remove_items_by_user_input():
             except ValueError:
                 print("Invalid input. Please enter a valid index or 'q' to quit.")
 
+
+def user_input_handler():
+    global exit_program
+    user_input = input()
+    if user_input.lower() == 'q':
+        exit_program = True
+
 if __name__ == "__main__":
     init_db()
     console = Console()
@@ -269,12 +276,13 @@ if __name__ == "__main__":
         else:
             print("Invalid input. Please enter 'a', 'r', 'g', or 'q'.")
 
-    while True:
+    while not exit_program:
         display_tracked_items()
-        start_time = time.time()
         print("Enter q to exit the program at any time.")
-        while (time.time() - start_time) < 120:
-            user_input = input()
-            if user_input.lower() == 'q':
-                sys.exit(0)
-            time.sleep(1)
+
+        input_thread = threading.Thread(target=user_input_handler, daemon=True)
+        input_thread.start()
+        input_thread.join(timeout=5)
+
+        if exit_program:
+            break
