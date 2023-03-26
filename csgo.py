@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
         input_thread = threading.Thread(target=user_input_handler, daemon=True)
         input_thread.start()
-        input_thread.join(timeout=5)
+        input_thread.join(timeout=320)
 
         if exit_program:
             break
