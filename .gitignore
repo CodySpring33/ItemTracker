@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 
 csgo_items.db
+backup.csgo_items.db
