@@ -92,12 +92,22 @@ def fetch_item_value(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
     }
+
+    
+
     response = requests.get(url, headers=headers)
+
+    if response.status_code == 429:
+        print(f"Rate limit exceeded for the item at {url}. Retrying in 10 seconds...")
+        time.sleep(10)
+        return fetch_item_value(url)
+
     data = json.loads(response.content)
     price_element = data["lowest_price"]
+    price = price_element.replace(",", "")
     
-    if price_element:
-        return price_element
+    if price:
+        return price
     else:
         print(f"Could not fetch the price for the item at {url}.")
         return None
@@ -237,6 +247,27 @@ def remove_items_by_user_input():
             except ValueError:
                 print("Invalid input. Please enter a valid index or 'q' to quit.")
 
+def swap_items(index1, index2):
+    conn = sqlite3.connect("csgo_items.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT rowid, * FROM items")
+    items = cursor.fetchall()
+
+    if index1 < 0 or index2 < 0 or index1 > len(items) or index2 > len(items):
+        print("Invalid indices. Please try again.")
+        return
+
+    item1 = items[index1]
+    item2 = items[index2]
+    
+    cursor.execute("UPDATE items SET name=?, url=? WHERE rowid=?", ("TEMP", item2[2], item2[0]))
+    cursor.execute("UPDATE items SET name=?, url=? WHERE rowid=?", (item2[1], item2[2], item1[0]))
+    cursor.execute("UPDATE items SET name=?, url=? WHERE rowid=?", (item1[1], item1[2], item2[0]))
+
+    conn.commit()
+    conn.close()
+
 
 def user_input_handler():
     global exit_program
@@ -250,7 +281,7 @@ if __name__ == "__main__":
     print_ascii_art()
 
     while True:
-        action = input("Do you want to (a)dd, (r)emove, (g)raph, or (q)uit? ").lower()
+        action = input("Do you want to (a)dd, (r)emove, (s)wap, (g)raph, or (q)uit? ").lower()
         if action == 'a':
             add_items_by_user_input()
         elif action == 'r':
@@ -271,6 +302,11 @@ if __name__ == "__main__":
                         print(f"Invalid index. Please enter a valid index.")
                 except ValueError:
                     print("Invalid input. Please enter a valid index or 'q' to quit.")
+        elif action == 's':
+            display_tracked_items()
+            index1 = int(input("Enter the index of the first item: "))
+            index2 = int(input("Enter the index of the second item: "))
+            swap_items(index1, index2)
         elif action == 'q':
             break
         else:
