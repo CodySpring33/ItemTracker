@@ -174,6 +174,7 @@ def remove_item_by_index(index):
         with sqlite3.connect(DB_NAME) as connection:
             cursor = connection.cursor()
             cursor.execute("DELETE FROM items WHERE name=?", (item_name,))
+            cursor.execute("DELETE FROM item_prices WHERE name=?", (item_name,))
             connection.commit()
         print(f"Item '{item_name}' removed successfully.")
     else:
@@ -217,7 +218,7 @@ if __name__ == "__main__":
                         name, _ = item
                         plot_item_price_graph(name)
                     else:
-                        print(f"Invalid index. Please enter an index between 0 and {len(tracked_items) - 1}.")
+                        print(f"Invalid index. Please enter a valid index.")
                 except ValueError:
                     print("Invalid input. Please enter a valid index or 'q' to quit.")
         elif action == 'q':
@@ -227,4 +228,4 @@ if __name__ == "__main__":
 
     while True:
         display_tracked_items()
-        time.sleep(120)  # Sleep for an hour before checking again
+        time.sleep(120)  # Sleep for 2 mins before checking again
