@@ -15,7 +15,7 @@ CS:GO Item Tracker is a command-line application that tracks the prices of your 
 
 1. Make sure you have Python 3.6 or higher installed on your system. You can download the latest version of Python from [the official website](https://www.python.org/downloads/).
 
-2. Clone the repository or download the `csgo_item_tracker.py` script to a directory of your choice.
+2. Clone the repository or download the `csgo.py` script to a directory of your choice.
 
 3. Install the required packages:
 
@@ -31,12 +31,12 @@ pip install windows-curses
 
 ## Usage
 
-1. Open a terminal or command prompt in the directory where the `csgo_item_tracker.py` script is located.
+1. Open a terminal or command prompt in the directory where the `csgo.py` script is located.
 
 2. Run the script:
 
 ```bash
-python csgo_item_tracker.py
+python csgo.py
 ```
 
 3. Follow the on-screen instructions to add items to your tracking list, view prices, and generate graphs.
