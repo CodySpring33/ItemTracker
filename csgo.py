@@ -237,19 +237,10 @@ def remove_items_by_user_input():
             except ValueError:
                 print("Invalid input. Please enter a valid index or 'q' to quit.")
 
-def user_input_handler():
-    while True:
-        user_input = input()
-        if user_input.lower() == 'q':
-            sys.exit(0)
-
 if __name__ == "__main__":
     init_db()
     console = Console()
     print_ascii_art()
-
-    input_thread = threading.Thread(target=user_input_handler, daemon=True)
-    input_thread.start()
 
     while True:
         action = input("Do you want to (a)dd, (r)emove, (g)raph, or (q)uit? ").lower()
@@ -280,4 +271,10 @@ if __name__ == "__main__":
 
     while True:
         display_tracked_items()
-        time.sleep(120)  # Sleep for 2 mins before checking again
+        start_time = time.time()
+        print("Enter q to exit the program at any time.")
+        while (time.time() - start_time) < 120:
+            user_input = input()
+            if user_input.lower() == 'q':
+                sys.exit(0)
+            time.sleep(1)
