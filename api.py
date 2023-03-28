@@ -21,8 +21,6 @@ def fetch_item_value(url):
         print(f"Rate limit exceeded. Displaying last known price instead.")
         return -1
 
-    
-    print(data)
     try:
         price_element = data["lowest_price"]
     except:
