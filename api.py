@@ -67,9 +67,12 @@ def search_item_url(item_name):
     
 def add_item_by_name(item_name):
     url = search_item_url(item_name)
+    parsed = urllib.parse.urlparse(url)
+    query = urllib.parse.parse_qs(parsed.query)
+    name = urllib.parse.unquote(query['market_hash_name'][0])
     if url is not None:
-        db.add_item(item_name, url)
-        print(f"Item '{item_name}' added successfully.")
+        db.add_item(name, url)
+        print(f"Item '{name}' added successfully.")
     else:
         print(f"Item '{item_name}' not found.")
 
