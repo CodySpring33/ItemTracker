@@ -23,7 +23,7 @@ if __name__ == "__main__":
         elif action == 'r':
             utils.remove_items_by_user_input()
         elif action == 'g':
-            utils.display_tracked_items()
+            utils.display_stored_items()
             index_str = input("Enter the index of the item you want to graph (or 'q' to quit): ")
             if index_str.lower() == 'q':
                 continue
@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 except ValueError:
                     print("Invalid input. Please enter a valid index or 'q' to quit.")
         elif action == 's':
-            utils.display_tracked_items()
+            utils.display_stored_items()
             index1 = int(input("Enter the index of the first item: "))
             index2 = int(input("Enter the index of the second item: "))
             db.swap_items(index1, index2)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
         input_thread = threading.Thread(target=user_input_handler, daemon=True)
         input_thread.start()
-        input_thread.join(timeout=320)
+        input_thread.join(timeout=600)
 
         if exit_program:
             break

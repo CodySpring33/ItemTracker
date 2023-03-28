@@ -3,6 +3,8 @@ import requests
 import json
 import urllib.parse
 import db
+import os
+from dotenv import load_dotenv
 
 
 def fetch_item_value(url):
@@ -15,9 +17,8 @@ def fetch_item_value(url):
     response = requests.get(url, headers=headers)
 
     if response.status_code == 429:
-        print(f"Rate limit exceeded for the item at {url}. Retrying in 10 seconds...")
-        time.sleep(10)
-        return fetch_item_value(url)
+        print(f"Rate limit exceeded. Displaying last known price instead.")
+        return -1
 
     data = json.loads(response.content)
     price_element = data["lowest_price"]
@@ -45,12 +46,13 @@ def search_item_url(item_name):
     response = requests.get(search_url, params=query, headers=headers)
     search_results = response.json()
 
-    if search_results["total_count"] > 0:
+    if response.status_code != 429:
         first_result = search_results["results"][0]
         item_hash_name = first_result["hash_name"]
         item_url = f"http://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name={urllib.parse.quote(item_hash_name)}"
         return item_url
     else:
+        print(f"API Call Failed. Status Code:{response.status_code}")
         return None
     
 def add_item_by_name(item_name):

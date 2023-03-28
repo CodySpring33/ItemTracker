@@ -52,7 +52,12 @@ def display_tracked_items():
         name, url = item
         price = api.fetch_item_value(url)
         if price is not None:
-            previous_price = db.get_previous_price(name)
+            if price == -1:
+                price = db.get_previous_price(name)
+                previous_price = price
+                price = '$' + str(price)
+            else:
+                previous_price = db.get_previous_price(name)
             db.store_item_price(name, float(price.strip("$")))
             if previous_price is not None:
                 price_diff = float(price.strip("$")) - previous_price
@@ -81,9 +86,31 @@ def display_tracked_items():
     console = Console()
     console.print(table)
 
+def display_stored_items():
+    tracked_items = db.get_tracked_items()
+    items_data = []
+    for index, item in enumerate(tracked_items):
+        name, url = item
+        price = db.get_previous_price(name)
+        if price is not None:
+            formatted_price = '$' + str(price)
+            items_data.append([index, name, formatted_price])
+
+    table = Table(title="Tracked Items", show_header=True, header_style="bold")
+    table.add_column("Index")
+    table.add_column("Item Name")
+    table.add_column("Price")
+
+    for row in items_data:
+        table.add_row(str(row[0]), row[1], row[2])
+
+    console = Console()
+    console.print(table)
+
+
 def remove_items_by_user_input():
     while True:
-        display_tracked_items()
+        display_stored_items()
         index_str = input("Enter the index of the item you want to remove (or 'q' to quit): ")
         if index_str.lower() == 'q':
             break
