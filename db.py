@@ -50,7 +50,7 @@ def get_previous_price(name):
         cursor = connection.cursor()
         cursor.execute("SELECT price FROM item_prices WHERE name=? ORDER BY timestamp DESC LIMIT 1", (name,))
         result = cursor.fetchone()
-    return result[0] if result else None
+    return result[0] if result else 0.0
 
 def remove_item_by_index(index):
     tracked_items = get_tracked_items()

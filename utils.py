@@ -57,10 +57,10 @@ def display_tracked_items():
         name, url = item
         price = api.fetch_item_value(url)
         if price is not None:
-            price_float = 0.00
             if price == -1:
                 price = db.get_previous_price(name)
                 previous_price = -1
+                price_float = 0.00
                 price = f'{SIGN}' + str(price) + f" ({SIGN} {str(round(price * .85,2))})"
             else:
                 previous_price = db.get_previous_price(name)
@@ -69,7 +69,7 @@ def display_tracked_items():
                 price_tax = round(price_float*.85,2) 
 
 
-            if previous_price is not None or previous_price != -1:
+            if previous_price != -1:
                 price_diff = price_float - previous_price
                 if price_diff > 0:
                     arrow = "↑"

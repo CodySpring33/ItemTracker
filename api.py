@@ -23,11 +23,16 @@ def fetch_item_value(url):
 
     
     print(data)
-    price_element = data["lowest_price"]
+    try:
+        price_element = data["lowest_price"]
+    except:
+        print("Price not found, most likey no item of this type on the market")
+        return None
     
     
     if os.getenv('CURRENCY') != '$':
-        price = price_element.replace(",", ".")
+        price = price_element.replace(",","")
+        price = price.replace(" ", "")
     else:
         price = price_element.replace(",", "")
     
