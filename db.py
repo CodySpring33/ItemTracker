@@ -50,7 +50,7 @@ def get_previous_price(name):
         cursor = connection.cursor()
         cursor.execute("SELECT price FROM item_prices WHERE name=? ORDER BY timestamp DESC LIMIT 1", (name,))
         result = cursor.fetchone()
-    return result[0] if result else None
+    return result[0] if result else 0.0
 
 def remove_item_by_index(index):
     tracked_items = get_tracked_items()
@@ -83,5 +83,12 @@ def swap_items(index1, index2):
     cursor.execute("UPDATE items SET name=?, url=? WHERE rowid=?", (item2[1], item2[2], item1[0]))
     cursor.execute("UPDATE items SET name=?, url=? WHERE rowid=?", (item1[1], item1[2], item2[0]))
 
+    conn.commit()
+    conn.close()
+
+def update_url(new_url, name):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('UPDATE items SET url=? WHERE name=?', (new_url,  name))
     conn.commit()
     conn.close()

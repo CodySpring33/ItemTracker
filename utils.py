@@ -4,6 +4,10 @@ from rich.table import Table
 import time
 import db
 import api
+import os
+from dotenv import load_dotenv, set_key
+
+load_dotenv()
 
 def print_ascii_art():
     ascii_art = r''' /$$$$$$ /$$$$$$$$ /$$$$$$$$ /$$      /$$       /$$$$$$$$ /$$$$$$$   /$$$$$$   /$$$$$$  /$$   /$$
@@ -46,6 +50,7 @@ def plot_item_price_graph(name):
         print(f"No price data found for the item '{name}'")
 
 def display_tracked_items():
+    SIGN = os.getenv('CURRENCY')
     tracked_items = db.get_tracked_items()
     items_data = []
     for index, item in enumerate(tracked_items):
@@ -54,16 +59,17 @@ def display_tracked_items():
         if price is not None:
             if price == -1:
                 price = db.get_previous_price(name)
-                previous_price = price
-                price = '$' + str(price) + f"(${str(round(price * .85,2))})" 
+                previous_price = -1
+                price_float = 0.00
+                price = f'{SIGN}' + str(price) + f" ({SIGN} {str(round(price * .85,2))})"
             else:
                 previous_price = db.get_previous_price(name)
+                price_float = float(price.strip(f"{SIGN}"))
+                db.store_item_price(name, price_float)
+                price_tax = round(price_float*.85,2) 
 
-            price_float = float(price.strip("$"))
-            db.store_item_price(name, price_float)
-            price_tax = round(price_float*.85,2)
 
-            if previous_price is not None:
+            if previous_price != -1:
                 price_diff = price_float - previous_price
                 if price_diff > 0:
                     arrow = "↑"
@@ -74,9 +80,9 @@ def display_tracked_items():
                 else:
                     arrow = "→"
                     color = "yellow"
-                formatted_price = f"{price} (${price_tax}) [bold {color}]{arrow}[/bold {color}]"
+                formatted_price = f"{price} ({SIGN} {price_tax}) [bold {color}]{arrow}[/bold {color}]"
             else:
-                formatted_price = str(price) + f" (${price_tax})"
+                formatted_price = price
             items_data.append([index, name, formatted_price])
 
     table = Table(title="Tracked Items", show_header=True, header_style="bold")
@@ -91,6 +97,7 @@ def display_tracked_items():
     console.print(table)
 
 def display_stored_items():
+    SIGN = os.getenv('CURRENCY')
     tracked_items = db.get_tracked_items()
     items_data = []
     for index, item in enumerate(tracked_items):
@@ -98,8 +105,8 @@ def display_stored_items():
         price = db.get_previous_price(name)
         if price is not None:
             tax_price = round(price * .85,2)
-            formatted_price = '$' + str(price)
-            formatted_tax = '$' + str(tax_price)
+            formatted_price = f'{SIGN}' + str(price)
+            formatted_tax = f'{SIGN}' + str(tax_price)
             items_data.append([index, name, formatted_price+f" ({formatted_tax})"])
 
     table = Table(title="Tracked Items", show_header=True, header_style="bold")
@@ -140,4 +147,31 @@ def get_item_by_index(index):
     if 0 <= index < len(tracked_items):
         return tracked_items[index]
     else:
-        return None  
+        return None
+    
+def get_currency_symbol(currency_code):
+    currency_symbols = {
+        1: '$', 2: '£', 3: '€', 4: 'CHF', 5: '₽', 6: 'zł', 7: 'R$', 8: '¥',
+        9: 'kr', 10: 'Rp', 11: 'RM', 12: '₱', 13: 'S$', 14: '฿', 15: '₫',
+        16: '₩', 17: '₺', 18: '₴', 19: 'Mex$', 20: 'C$', 21: 'A$', 22: 'NZ$',
+        23: '¥', 24: '₹', 25: 'CLP$', 26: 'S/', 27: '$', 28: 'R', 29: 'HK$',
+        30: 'NT$', 31: 'SR', 32: 'AED', 33: 'kr', 34: '$', 35: '₪', 36: 'Br',
+        37: '₸', 38: 'د.ك', 39: 'ر.ق', 40: '₡', 41: '$U'
+    }
+    return currency_symbols.get(currency_code, '')
+
+
+def update_currency(currency):
+    items = db.get_tracked_items()
+    os.environ["CURRENCY"] = get_currency_symbol(currency)
+    os.environ["CODE"] = str(currency)
+    set_key('.env', 'CURRENCY', os.environ["CURRENCY"])
+    set_key('.env', 'CODE', os.environ["CODE"])
+
+    for item in items:
+        hash = api.extract_hash(item[1])
+        new_url = f"http://steamcommunity.com/market/priceoverview/?appid=730&currency={currency}&market_hash_name={hash}"
+        db.update_url(new_url, item[0])
+
+    print("Currency updated")
+    
