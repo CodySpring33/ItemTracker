@@ -55,12 +55,16 @@ def display_tracked_items():
             if price == -1:
                 price = db.get_previous_price(name)
                 previous_price = price
-                price = '$' + str(price)
+                price = '$' + str(price) + f"(${str(round(price * .85,2))})" 
             else:
                 previous_price = db.get_previous_price(name)
-            db.store_item_price(name, float(price.strip("$")))
+
+            price_float = float(price.strip("$"))
+            db.store_item_price(name, price_float)
+            price_tax = round(price_float*.85,2)
+
             if previous_price is not None:
-                price_diff = float(price.strip("$")) - previous_price
+                price_diff = price_float - previous_price
                 if price_diff > 0:
                     arrow = "↑"
                     color = "green"
@@ -70,9 +74,9 @@ def display_tracked_items():
                 else:
                     arrow = "→"
                     color = "yellow"
-                formatted_price = f"{price} [bold {color}]{arrow}[/bold {color}]"
+                formatted_price = f"{price} (${price_tax}) [bold {color}]{arrow}[/bold {color}]"
             else:
-                formatted_price = price
+                formatted_price = str(price) + f" (${price_tax})"
             items_data.append([index, name, formatted_price])
 
     table = Table(title="Tracked Items", show_header=True, header_style="bold")
@@ -93,8 +97,10 @@ def display_stored_items():
         name, url = item
         price = db.get_previous_price(name)
         if price is not None:
+            tax_price = round(price * .85,2)
             formatted_price = '$' + str(price)
-            items_data.append([index, name, formatted_price])
+            formatted_tax = '$' + str(tax_price)
+            items_data.append([index, name, formatted_price+f" ({formatted_tax})"])
 
     table = Table(title="Tracked Items", show_header=True, header_style="bold")
     table.add_column("Index")
