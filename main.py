@@ -17,7 +17,7 @@ if __name__ == "__main__":
     utils.print_ascii_art()
 
     while True:
-        action = input("Do you want to (a)dd, (r)emove, (s)wap, (g)raph, or (q)uit? ").lower()
+        action = input("Do you want to (a)dd, (r)emove, (s)wap, (g)raph, (c)hange currency, or (q)uit? ").lower()
         if action == 'a':
             utils.add_items_by_user_input()
         elif action == 'r':
@@ -43,6 +43,9 @@ if __name__ == "__main__":
             index1 = int(input("Enter the index of the first item: "))
             index2 = int(input("Enter the index of the second item: "))
             db.swap_items(index1, index2)
+        elif action == 'c':
+            currency = int(input("Enter your currency code of choice: "))
+            utils.update_currency(currency)
         elif action == 'q':
             break
         else:

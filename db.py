@@ -85,3 +85,10 @@ def swap_items(index1, index2):
 
     conn.commit()
     conn.close()
+
+def update_url(new_url, name):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('UPDATE items SET url=? WHERE name=?', (new_url,  name))
+    conn.commit()
+    conn.close()

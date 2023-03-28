@@ -1,4 +1,3 @@
-import time
 import requests
 import json
 import urllib.parse
@@ -6,6 +5,7 @@ import db
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
 
 def fetch_item_value(url):
     headers = {
@@ -15,14 +15,21 @@ def fetch_item_value(url):
     
 
     response = requests.get(url, headers=headers)
+    data = json.loads(response.content)
 
-    if response.status_code == 429:
+    if response.status_code == 429 or data["success"] == False:
         print(f"Rate limit exceeded. Displaying last known price instead.")
         return -1
 
-    data = json.loads(response.content)
+    
+    print(data)
     price_element = data["lowest_price"]
-    price = price_element.replace(",", "")
+    
+    
+    if os.getenv('CURRENCY') != '$':
+        price = price_element.replace(",", ".")
+    else:
+        price = price_element.replace(",", "")
     
     if price:
         return price
@@ -49,7 +56,7 @@ def search_item_url(item_name):
     if response.status_code != 429:
         first_result = search_results["results"][0]
         item_hash_name = first_result["hash_name"]
-        item_url = f"http://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name={urllib.parse.quote(item_hash_name)}"
+        item_url = f"http://steamcommunity.com/market/priceoverview/?appid=730&currency={os.getenv('CODE')}&market_hash_name={urllib.parse.quote(item_hash_name)}"
         return item_url
     else:
         print(f"API Call Failed. Status Code:{response.status_code}")
@@ -62,3 +69,8 @@ def add_item_by_name(item_name):
         print(f"Item '{item_name}' added successfully.")
     else:
         print(f"Item '{item_name}' not found.")
+
+def extract_hash(url):
+    parsed = urllib.parse.urlparse(url)
+    query = urllib.parse.parse_qs(parsed.query)
+    return urllib.parse.quote(query['market_hash_name'][0])
