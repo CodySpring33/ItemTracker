@@ -11,6 +11,7 @@ import os
 class TestFunctions(unittest.TestCase):
     
     def setUp(self):
+        db.init_db()
         self.test_item = ('test_item', 'http://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name=Fracture%20Case')
         self.test_price = 1.99
         db.clear_database()
