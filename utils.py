@@ -134,7 +134,6 @@ def display_stored_items():
     console = Console()
     console.print(table)
 
-
 def remove_items_by_user_input():
     while True:
         index_str = input("Enter the index of the item you want to remove (or 'q' to quit): ")
