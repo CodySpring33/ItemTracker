@@ -2,6 +2,7 @@ import db
 import utils
 from rich.console import Console
 import threading
+import asyncio
 
 exit_program = False
 
@@ -11,7 +12,7 @@ def user_input_handler():
     if user_input.lower() == 'q':
         exit_program = True  
 
-if __name__ == "__main__":
+async def main():
     db.init_db()
     console = Console()
     utils.print_ascii_art()
@@ -52,12 +53,15 @@ if __name__ == "__main__":
             print("Invalid input. Please enter 'a', 'r', 'g', or 'q'.")
 
     while not exit_program:
-        utils.display_tracked_items()
+        await utils.display_tracked_items()
         print("Enter q to exit the program at any time.")
 
         input_thread = threading.Thread(target=user_input_handler, daemon=True)
         input_thread.start()
         input_thread.join(timeout=600)
-
+        
         if exit_program:
             break
+
+if __name__ == "__main__":
+    asyncio.run(main())

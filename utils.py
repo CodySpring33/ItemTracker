@@ -6,6 +6,7 @@ import db
 import api
 import os
 from dotenv import load_dotenv, set_key
+import asyncio
 
 load_dotenv()
 
@@ -49,13 +50,25 @@ def plot_item_price_graph(name):
     else:
         print(f"No price data found for the item '{name}'")
 
-def display_tracked_items():
+async def fetch_all_items(tracked_items):
+    tasks = []
+    for name, url in tracked_items:
+        tasks.append(asyncio.create_task(api.fetch_item_value(url)))
+
+    return await asyncio.gather(*tasks)
+
+async def display_tracked_items():
     SIGN = os.getenv('CURRENCY')
     tracked_items = db.get_tracked_items()
+    total_items = len(tracked_items)
     items_data = []
+
+    prices = await fetch_all_items(tracked_items)
+
     for index, item in enumerate(tracked_items):
         name, url = item
-        price = api.fetch_item_value(url)
+        loading_bar(index+1, total_items)
+        price = prices[index]
         if price is not None:
             if price == -1:
                 price = db.get_previous_price(name)
@@ -95,6 +108,7 @@ def display_tracked_items():
 
     console = Console()
     console.print(table)
+
 
 def display_stored_items():
     SIGN = os.getenv('CURRENCY')
@@ -174,4 +188,16 @@ def update_currency(currency):
         db.update_url(new_url, item[0])
 
     print("Currency updated")
-    
+
+def loading_bar(current, total):
+
+    bar_length = 30
+    filled_length = int(round(bar_length * current / float(total)))
+
+    percent = round(100.0 * current / float(total), 1)
+    bar = '#' * filled_length + '-' * (bar_length - filled_length)
+
+    print(f'[{bar}] {percent}%\r', end='')
+    if current == total:
+        print()
+ 

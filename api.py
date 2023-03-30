@@ -1,44 +1,44 @@
 import requests
-import json
 import urllib.parse
 import db
 import os
 from dotenv import load_dotenv
+import json
+import aiohttp
 
 load_dotenv()
 
-def fetch_item_value(url):
+
+async def fetch_item_value(url):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
     }
 
-    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            data = await response.json()
 
-    response = requests.get(url, headers=headers)
-    data = json.loads(response.content)
+            if response.status == 429 or data["success"] == False:
+                print(f"Rate limit exceeded. Displaying last known price instead.")
+                return -1
 
-    if response.status_code == 429 or data["success"] == False:
-        print(f"Rate limit exceeded. Displaying last known price instead.")
-        return -1
+            try:
+                price_element = data["lowest_price"]
+            except:
+                print("Price not found, most likely no item of this type on the market")
+                return None
 
-    try:
-        price_element = data["lowest_price"]
-    except:
-        print("Price not found, most likey no item of this type on the market")
-        return None
-    
-    
-    if os.getenv('CURRENCY') != '$':
-        price = price_element.replace(",","")
-        price = price.replace(" ", "")
-    else:
-        price = price_element.replace(",", "")
-    
-    if price:
-        return price
-    else:
-        print(f"Could not fetch the price for the item at {url}.")
-        return None
+            if os.getenv('CURRENCY') != '$':
+                price = price_element.replace(",","")
+                price = price.replace(" ", "")
+            else:
+                price = price_element.replace(",", "")
+            
+            if price:
+                return price
+            else:
+                print(f"Could not fetch the price for the item at {url}.")
+                return None
     
 def search_item_url(item_name):
     search_url = "https://steamcommunity.com/market/search/render/"
