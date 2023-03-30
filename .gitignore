@@ -153,3 +153,4 @@ cython_debug/
 
 csgo_items.db
 backup.csgo_items.db
+remake.sh

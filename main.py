@@ -15,7 +15,7 @@ def user_input_handler():
 async def main():
     db.init_db()
     console = Console()
-    utils.print_ascii_art()
+    #utils.print_ascii_art()
 
     while True:
         action = input("Do you want to (a)dd, (r)emove, (s)wap, (g)raph, (c)hange currency, or (q)uit? ").lower()

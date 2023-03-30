@@ -13,7 +13,6 @@ class TestFunctions(unittest.TestCase):
     def setUp(self):
         self.test_item = ('test_item', 'http://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name=Fracture%20Case')
         self.test_price = 1.99
-        db.init_db()
         db.clear_database()
         
     def test_get_item_by_index(self):
@@ -57,7 +56,9 @@ class TestFunctions(unittest.TestCase):
         self.assertIn('£', os.getenv('CURRENCY'))
         self.assertIn('2', os.getenv('CODE'))
         self.assertIn(f"http://steamcommunity.com/market/priceoverview/?appid=730&currency={os.getenv('CODE')}", db_item[1])
+        utils.update_currency(1)
         db.clear_database()
-        
+
 if __name__ == '__main__':
     unittest.main(argv=['first-arg-is-ignored'], exit=False)
+

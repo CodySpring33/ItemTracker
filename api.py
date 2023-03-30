@@ -69,7 +69,10 @@ def add_item_by_name(item_name):
     url = search_item_url(item_name)
     parsed = urllib.parse.urlparse(url)
     query = urllib.parse.parse_qs(parsed.query)
-    name = urllib.parse.unquote(query['market_hash_name'][0])
+    try:
+        name = urllib.parse.unquote(query['market_hash_name'][0])
+    except:
+        print("probably rate limited")
     if url is not None:
         db.add_item(name, url)
         print(f"Item '{name}' added successfully.")
