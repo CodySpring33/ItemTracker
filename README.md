@@ -1,4 +1,4 @@
-# CS:GO Item Tracker
+# CS:GO Item Tracker [![Item Tracker](https://github.com/CodySpring33/ItemTracker/actions/workflows/main.yml/badge.svg)](https://github.com/CodySpring33/ItemTracker/actions/workflows/main.yml)
 
 CS:GO Item Tracker is a command-line application that tracks the prices of your favorite CS:GO items on the Steam Market. It allows you to easily monitor price trends, view historical price data, and add or remove items from your tracking list.
 
