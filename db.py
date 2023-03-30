@@ -3,7 +3,12 @@ import time
 import os
 
 DB_NAME = "csgo_items.db"
-DB_DIR = os.path.join(os.getenv("APPDATA"), "csgoItemTracker")
+
+if os.getenv("APPDATA") is not None:
+    DB_DIR = os.path.join(os.getenv("APPDATA"), "csgoItemTracker")
+else:
+    DB_DIR = os.path.join(os.getcwd(), "csgoItemTracker")
+
 DB_PATH = DB_PATH = os.path.join(DB_DIR, DB_NAME)
 
 def init_db():
