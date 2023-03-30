@@ -137,7 +137,6 @@ def display_stored_items():
 
 def remove_items_by_user_input():
     while True:
-        display_stored_items()
         index_str = input("Enter the index of the item you want to remove (or 'q' to quit): ")
         if index_str.lower() == 'q':
             break

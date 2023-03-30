@@ -61,7 +61,7 @@ def remove_item_by_index(index):
             cursor.execute("DELETE FROM items WHERE name=?", (item_name,))
             cursor.execute("DELETE FROM item_prices WHERE name=?", (item_name,))
             connection.commit()
-        print(f"Item '{item_name}' removed successfully.")
+        print(f"Item at index #{index} removed successfully.")
     else:
         print(f"Invalid index. Please enter an index between 0 and {len(tracked_items) - 1}.")
 
@@ -90,5 +90,15 @@ def update_url(new_url, name):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('UPDATE items SET url=? WHERE name=?', (new_url,  name))
+    conn.commit()
+    conn.close()
+
+def clear_database():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM items")
+    cursor.execute("DELETE FROM item_prices")
+
     conn.commit()
     conn.close()

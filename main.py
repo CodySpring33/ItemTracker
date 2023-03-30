@@ -22,6 +22,7 @@ async def main():
         if action == 'a':
             utils.add_items_by_user_input()
         elif action == 'r':
+            utils.display_stored_items()
             utils.remove_items_by_user_input()
         elif action == 'g':
             utils.display_stored_items()
