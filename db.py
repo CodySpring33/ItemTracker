@@ -1,6 +1,7 @@
 import sqlite3
 import time
 import os
+import utils
 
 DB_NAME = "csgo_items.db"
 
@@ -110,7 +111,7 @@ def clear_database():
 
 
 
-def sort_items_by_price():
+async def sort_items_by_price():
     while True:
         direction = input("Order your items by price (a)scending or (d)escending? ").lower()
         if direction == 'a':
@@ -121,6 +122,7 @@ def sort_items_by_price():
             break
         
     try:
+        await utils.display_tracked_items()
         # Open a connection to the database
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -156,6 +158,8 @@ def sort_items_by_price():
         conn.commit()
         cursor.close()
         conn.close()
+
+        utils.display_stored_items()
 
     except sqlite3.Error as e:
         # If an error occurs, rollback the changes and close the connection

@@ -26,7 +26,7 @@ async def main():
             utils.display_stored_items()
             utils.remove_items_by_user_input()
         elif action == 'o':
-            db.sort_items_by_price()
+            await db.sort_items_by_price()
         elif action == 'g':
             utils.display_stored_items()
             index_str = input("Enter the index of the item you want to graph (or 'q' to quit): ")
