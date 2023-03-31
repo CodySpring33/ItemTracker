@@ -110,14 +110,23 @@ def clear_database():
 
 
 
-def sort_items_by_price(direction):
+def sort_items_by_price():
+    while True:
+        direction = input("Order your items by price (a)scending or (d)escending? ").lower()
+        if direction == 'a':
+            sort = "ASC"
+            break
+        elif direction == 'd':
+            sort = "DESC"
+            break
+        
     try:
         # Open a connection to the database
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
         # Next, retrieve the sorted results
-        query = """
+        query = f"""
         SELECT items.name, items.url
         FROM items
         JOIN (
@@ -128,7 +137,7 @@ def sort_items_by_price(direction):
         ON items.name = latest_prices.name
         JOIN item_prices
         ON item_prices.name = latest_prices.name AND item_prices.timestamp = latest_prices.max_timestamp
-        ORDER BY item_prices.price ASC
+        ORDER BY item_prices.price {sort}
         """
 
         cursor.execute(query)

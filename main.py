@@ -19,12 +19,14 @@ async def main():
     utils.print_ascii_art()
 
     while True:
-        action = input("Do you want to (a)dd, (r)emove, (s)wap, (g)raph, (c)hange currency, or (q)uit? ").lower()
+        action = input("Do you want to (a)dd, (r)emove, (s)wap, (o)rder, (g)raph, (c)hange currency, or (q)uit? ").lower()
         if action == 'a':
             utils.add_items_by_user_input()
         elif action == 'r':
             utils.display_stored_items()
             utils.remove_items_by_user_input()
+        elif action == 'o':
+            db.sort_items_by_price()
         elif action == 'g':
             utils.display_stored_items()
             index_str = input("Enter the index of the item you want to graph (or 'q' to quit): ")
