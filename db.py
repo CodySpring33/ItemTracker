@@ -17,7 +17,7 @@ def init_db():
 
     with sqlite3.connect(DB_PATH) as connection:
         cursor = connection.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS items (name TEXT UNIQUE, url TEXT)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS items (name TEXT, url TEXT)")
         cursor.execute("CREATE TABLE IF NOT EXISTS item_prices (timestamp INTEGER, name TEXT, price REAL)")
         connection.commit()
 
@@ -107,3 +107,60 @@ def clear_database():
 
     conn.commit()
     conn.close()
+
+
+
+def sort_items_by_price():
+    while True:
+        direction = input("Order your items by price (a)scending or (d)escending? ").lower()
+        if direction == 'a':
+            sort = "ASC"
+            break
+        elif direction == 'd':
+            sort = "DESC"
+            break
+        
+    try:
+        # Open a connection to the database
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        # Next, retrieve the sorted results
+        query = f"""
+        SELECT items.name, items.url
+        FROM items
+        JOIN (
+            SELECT name, MAX(timestamp) AS max_timestamp
+            FROM item_prices
+            GROUP BY name
+        ) latest_prices
+        ON items.name = latest_prices.name
+        JOIN item_prices
+        ON item_prices.name = latest_prices.name AND item_prices.timestamp = latest_prices.max_timestamp
+        ORDER BY item_prices.price {sort}
+        """
+
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        # Next, update the row order of the items table
+        update_query = """
+        UPDATE items SET name=?, url=? WHERE rowid=?
+        """
+        
+        for i, (name, url) in enumerate(results):
+            cursor.execute(update_query, (name, url, i+1))
+        
+        
+        # Commit the changes and close the connection
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except sqlite3.Error as e:
+        # If an error occurs, rollback the changes and close the connection
+        
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        raise e
