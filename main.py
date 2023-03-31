@@ -14,7 +14,8 @@ def user_input_handler():
 
 async def main():
     db.init_db()
-
+    
+    
     utils.print_ascii_art()
 
     while True:
@@ -66,3 +67,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
